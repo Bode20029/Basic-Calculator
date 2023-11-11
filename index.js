@@ -1,14 +1,16 @@
-const displayInput = document.getElementById("inputValue").innerText = 'Hello'
+const displayInput = document.getElementById("inputValue")
 
 //Variables
-const operators = ['-', '+', '*', '/']
+const operators = ['-', '+', '%','*', '/']
+let operations = []
+let currValue = ''
 
 //Function & Operations
 
 function handleInteraction(value) {
     if (operators.includes(value)) {
         console.log('Clicked an operator: ',value)
-        handleEvaluatedOperator(value) 
+        handleOperatorInput(value) 
     } else {
         console.log('Clicked a numeric value: ',value)
         handleNumericInput(value)
@@ -17,8 +19,10 @@ function handleInteraction(value) {
 }
 
 function handleNumericInput(value) {
+    if (value === '.' && currValue.includes('.')) {return}
     currValue += value
-    console.log('NEW VALUE: ',currValue)
+
+    
 }
 
 function handleOperatorInput(value) {
@@ -31,14 +35,40 @@ function handleOperatorInput(value) {
     currValue = ''
 }
 
-function handleEvaluate(){
 
+
+function handleEvaluate(){
+    if (operations.length === 0){ return }
+    let finalAmount = operations[0]
+    let prevOperator = null
+    if (!currValue) {
+        operations.pop()
+    }  else {
+        operations.push(currValue)
+        currValue = ''
+    }
+    for (let i = 1; i < operations.length; i++) {
+        if (i % 2 === 0){
+            //numeric value
+            finalAmount = eval(`${finalAmount} ${prevOperator} ${operations[i]}`)
+        }
+       else {
+            //Operator value
+            prevOperator = operations[i]
+    }
+}
+    operations = []
+    currValue = finalAmount.toFixed(2)
+    updateUI()
 }
 
 function handleReset() {
-
+    currValue = ''
+    operations = []
+    updateUI()
 }
 
 function updateUI() {
-    console.log(operators)
+    const displayString = operations.join(' ') + ' ' + currValue
+    displayInput.innerText = displayString.trim() ? displayString : '0'
 }
